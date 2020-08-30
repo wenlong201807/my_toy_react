@@ -57,12 +57,25 @@ export class Component {
     this._range.deleteContents() // 删除所有旧的节点
     this[RENDER_TO_DOM] (this._range) // 绘制新的节点
   }
-  // get root () { // 产生一个getter
-  //   if (!this._root) {
-  //     this._root = this.render().root // 此处可能发生递归，直到变成ElementWrapper或者TextWrapper
-  //   }
-  //   return this._root
-  // }
+  setState (newState) {
+    // 著名的一个js坑 typeof null === 'object' => this.state === null || typeof this.state !== 'object'
+    if (this.state === null || typeof this.state !== 'object') {
+      this.state = newState
+      this.render()
+      return
+    }
+    let merge = (oldState, newState)=>{
+      for (let p in newState) {
+        if (oldState[p] === null || typeof oldState[p] !== 'object') {
+          oldState[p] = newState[p]
+        } else {
+          merge(oldState[p],newState[p])
+        }
+      }
+    }
+    merge(this.state, newState)
+    this.rerender()
+  }
 }
 
 

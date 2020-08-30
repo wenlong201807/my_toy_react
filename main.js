@@ -10,8 +10,12 @@ class MyComponent extends Component {
   render () {
     return <div>
       <h1>my component</h1>
+      
+      {/*<button onClick={() => { this.state.a++; this.rerender() }}>add</button> */}
+       <button onClick={() => { this.setState({a:this.state.a+1}) }}>add</button>
+      <hr></hr>
       <span>{this.state.a.toString()}</span>
-      <button onClick={() => { this.state.a++; this.rerender() }}>add</button>
+      <span>  ===={this.state.b.toString()}</span>
       {this.children}
     </div>
   }
