@@ -58,8 +58,16 @@ export class Component {
     this.render()[RENDER_TO_DOM](range)
   }
   rerender () { // 重绘 // 虚实dom的前奏
-    this._range.deleteContents() // 删除所有旧的节点
-    this[RENDER_TO_DOM](this._range) // 绘制新的节点
+    let oldRange = this._range // 保留老的range
+
+    let range = document.createRange()
+    range.setStart(oldRange.startContainer,oldRange.startOffset)
+    range.setEnd(oldRange.startContainer,oldRange.startOffset)
+    this[RENDER_TO_DOM](range) // 绘制新的节点
+
+    oldRange.setStart(range.endContainer,range.endOffset)
+    oldRange.deleteContents() // 删除所有旧的节点 // 有个严重bug  全部清空的话，会把不该清除的清除掉
+
   }
   setState (newState) {
     // 著名的一个js坑 typeof null === 'object' => this.state === null || typeof this.state !== 'object'
