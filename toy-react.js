@@ -8,9 +8,13 @@ class ElementWrapper {
     // \s 所有空格，\S所有非空格 两个合在一起表示所有字符
     // 匹配出正则中括号的第一项
     if (name.match(/^on([\s\S]+)$/)) {
-      this.root.addEventListener(RegExp.$1.replace(/^[\s\S]/,c=>c.toLowerCase()),value)
-    } else {   
-      this.root.setAttribute(name, value)
+      this.root.addEventListener(RegExp.$1.replace(/^[\s\S]/, c => c.toLowerCase()), value)
+    } else {
+      if (name === 'className') { // className 属性，修改为class
+        this.root.setAttribute('class', value)
+      } else {
+        this.root.setAttribute(name, value)
+      }
     }
   }
   appendChild (component) {
@@ -55,7 +59,7 @@ export class Component {
   }
   rerender () { // 重绘 // 虚实dom的前奏
     this._range.deleteContents() // 删除所有旧的节点
-    this[RENDER_TO_DOM] (this._range) // 绘制新的节点
+    this[RENDER_TO_DOM](this._range) // 绘制新的节点
   }
   setState (newState) {
     // 著名的一个js坑 typeof null === 'object' => this.state === null || typeof this.state !== 'object'
@@ -64,12 +68,12 @@ export class Component {
       this.render()
       return
     }
-    let merge = (oldState, newState)=>{
+    let merge = (oldState, newState) => {
       for (let p in newState) {
         if (oldState[p] === null || typeof oldState[p] !== 'object') {
           oldState[p] = newState[p]
         } else {
-          merge(oldState[p],newState[p])
+          merge(oldState[p], newState[p])
         }
       }
     }
@@ -100,6 +104,10 @@ export function createElement (type, attributes, ...children) {
       if (typeof child === 'string') {
         child = new TextWrapper(child)
         // child = document.createTextNode(child)
+      }
+
+      if (child === null) { // 处理空节点
+        continue
       }
 
       // 节点嵌套节点时，不能直接在浏览器中展示数组，需要递归变成对应的节点
